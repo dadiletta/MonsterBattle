@@ -1,8 +1,8 @@
 package gui;
 import javax.swing.*;
 
-import Item;
-import Monster;
+import game.Item;
+import game.Monster;
 
 import java.awt.*;
 import java.awt.event.*;

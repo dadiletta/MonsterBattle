@@ -1,3 +1,4 @@
+package game;
 /**
  * Item - Represents a consumable item in the game
  * 
@@ -11,7 +12,9 @@
  * - Callbacks (storing behavior to execute later)
  * - Separation of concerns (item knows what it does)
  */
-public class Item {
+
+
+ public class Item {
     
     private String name;
     private String icon;

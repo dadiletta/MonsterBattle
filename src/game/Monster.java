@@ -1,3 +1,4 @@
+package game;
 public class Monster {
     // INSTANCE VARIABLES (properties)
     private int health;
