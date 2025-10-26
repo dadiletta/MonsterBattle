@@ -18,7 +18,11 @@ monsters.add(new Monster());
 // 3. Display them
 gui.updateMonsters(monsters);
 
-// 4. Wait for player input
+// 4. Setup player health
+gui.setPlayerMaxHealth(100);
+gui.updatePlayerHealth(100);
+
+// 5. Wait for player input
 int choice = gui.waitForAction(); // Returns 0-3 based on button clicked
 ```
 
@@ -40,14 +44,27 @@ gui.displayMessage("Player health: " + health);
 // Both messages will be visible - "You defeated..." above (dimmed) and "Player health..." below (bright)
 ```
 
-#### `updateInventory(ArrayList<String> items)`
+#### `updateInventory(ArrayList<Item> items)`
 Updates the inventory display with current items. Each item is displayed separately with its index, even if you have multiple items with the same name (items don't stack).
 ```java
-ArrayList<String> items = new ArrayList<>();
-items.add("Health Potion");  // Will show as [0] Health Potion
-items.add("Health Potion");  // Will show as [1] Health Potion
-items.add("Bomb");           // Will show as [2] Bomb
+ArrayList<Item> items = new ArrayList<>();
+items.add(new Item("Health Potion", "🧪", () -> { /* healing code */ }));
+items.add(new Item("Health Potion", "🧪", () -> { /* healing code */ }));
+items.add(new Item("Bomb", "💣", () -> { /* bomb code */ }));
 gui.updateInventory(items);
+```
+
+#### `updatePlayerHealth(int health)` ⭐ NEW!
+Updates the player's health bar display. Call this whenever the player's health changes!
+```java
+playerHealth -= damage;
+gui.updatePlayerHealth(playerHealth);  // Updates the health bar
+```
+
+#### `setPlayerMaxHealth(int maxHealth)` ⭐ NEW!
+Sets the maximum health for the player. Usually called once during setup.
+```java
+gui.setPlayerMaxHealth(100);  // Player starts with max 100 HP
 ```
 
 ### Button Methods
@@ -98,7 +115,7 @@ gui.setButtonsEnabled(true);  // Enable for player turn
 
 ```java
 public static void gameLoop() {
-    while (hasLivingMonsters() && playerAlive) {
+    while (hasLivingMonsters() && playerHealth > 0) {
         // Player's turn
         gui.displayMessage("Your turn! Choose an action.");
         int action = gui.waitForAction();
@@ -108,12 +125,16 @@ public static void gameLoop() {
         // Monster's turn
         if (hasLivingMonsters()) {
             monsterAttack();
+            gui.updatePlayerHealth(playerHealth);  // Update health bar!
             gui.updateMonsters(monsters);
         }
         
         // Check win/loss conditions
         if (!hasLivingMonsters()) {
             gui.displayMessage("Victory!");
+        }
+        if (playerHealth <= 0) {
+            gui.displayMessage("Defeat!");
         }
     }
 }
@@ -144,6 +165,36 @@ String[] selectLabels = {"Fighter", "Tank", "Healer", "Ninja"};
 gui.setActionButtons(selectLabels);
 gui.displayMessage("Choose your class!");
 int classChoice = gui.waitForAction();
+
+// Set max health based on class
+if (classChoice == 1) { // Tank
+    gui.setPlayerMaxHealth(150);
+    playerHealth = 150;
+} else {
+    gui.setPlayerMaxHealth(100);
+    playerHealth = 100;
+}
+gui.updatePlayerHealth(playerHealth);
+```
+
+### Taking Damage
+Always update the health bar when damage is taken!
+```java
+public static void takeDamage(int damage) {
+    playerHealth -= damage;
+    gui.updatePlayerHealth(playerHealth);  // Don't forget this!
+    gui.displayMessage("Took " + damage + " damage! HP: " + playerHealth);
+}
+```
+
+### Healing
+Update the health bar when healing too!
+```java
+public static void healPlayer(int amount) {
+    playerHealth = Math.min(maxHealth, playerHealth + amount);
+    gui.updatePlayerHealth(playerHealth);  // Don't forget this!
+    gui.displayMessage("Healed " + amount + " HP! HP: " + playerHealth);
+}
 ```
 
 ### Multi-Target Attack
@@ -163,10 +214,11 @@ gui.highlightMonster(-1); // Clear highlight
 ## Tips for Success
 
 1. **Always update the display** after changing monster health or inventory
-2. **Use displayMessage()** to give feedback to the player
-3. **Run your game loop in a thread** so the GUI doesn't freeze
-4. **Add small delays** (Thread.sleep) between actions for readability
-5. **The GUI handles clicks for you** - just call waitForAction()
+2. **Always update player health** after the player takes damage or heals
+3. **Use displayMessage()** to give feedback to the player
+4. **Run your game loop in a thread** so the GUI doesn't freeze
+5. **Add small delays** (Thread.sleep) between actions for readability
+6. **The GUI handles clicks for you** - just call waitForAction()
 
 ## Monster Class Requirements
 
@@ -179,6 +231,25 @@ Your Monster class needs these public methods:
 
 See the provided Monster class for the correct implementation.
 
+## Item Class Requirements
+
+Your Item class needs:
+- Constructor: `Item(String name, String icon, Runnable onUse)`
+- Methods: `use()`, `getName()`, `getIcon()`
+
+See the provided Item class and Guide-Item.md for details on creating items with effects!
+
+## Visual Features
+
+The player health bar:
+- **Green** when health > 50%
+- **Orange** when health is 25-50%
+- **Red** when health < 25%
+- Shows percentage and exact HP values
+- Automatically updates with smooth colors
+
 ## See Also
-- `BattleGameDemo.java` - Complete working example
+- `BattleGameDemo.java` - Complete working example with player health bar
 - `Monster.java` - Required Monster class implementation
+- `Item.java` - Item class for consumables
+- `Guide-Item.md` - Guide to creating items with effects

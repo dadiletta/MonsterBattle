@@ -4,19 +4,19 @@ import java.awt.event.*;
 import java.util.ArrayList;
 
 /**
- * MonsterBattleGUI - A student-friendly API for displaying monster battles
+ * MonsterBattleGUI - A simple display API for monster battle games
  * 
- * This class provides a graphical interface for the Monster Battle game.
- * Students interact with this API to display monsters, handle player actions,
- * and show inventory items.
+ * This class provides methods to display your game state.
+ * You control the game loop - just call these methods to update the display!
  * 
  * STUDENT API METHODS:
- * - updateMonsters(ArrayList<Monster>) - Refresh the monster display
- * - setActionButtons(String[]) - Set custom button labels (4 buttons)
- * - waitForAction() - Returns 0-3 based on which button is clicked
- * - updateInventory(ArrayList<String>) - Update inventory display
- * - displayMessage(String) - Show a message to the player
- * - highlightMonster(int) - Highlight a specific monster
+ * - updateMonsters(ArrayList<Monster>) - Show current monsters
+ * - updatePlayerHealth(int) - Show player health
+ * - updateInventory(ArrayList<Item>) - Show items
+ * - displayMessage(String) - Show a message
+ * - setActionButtons(String[]) - Label the 4 buttons
+ * - waitForAction() - Wait for button click, returns 0-3
+ * - highlightMonster(int) - Highlight a monster briefly
  */
 public class MonsterBattleGUI extends JFrame {
     
@@ -25,116 +25,128 @@ public class MonsterBattleGUI extends JFrame {
     private ActionButtonPanel buttonPanel;
     private InventoryPanel inventoryPanel;
     private MessagePanel messagePanel;
+    private PlayerStatusPanel playerStatusPanel;
     
-    // State tracking
+    // For button clicks
     private int selectedAction = -1;
     private boolean waitingForInput = false;
     private final Object actionLock = new Object();
     
-    // Layout constants
-    private static final int WINDOW_WIDTH = 1000;
-    private static final int WINDOW_HEIGHT = 700;
-    
     /**
-     * Constructor - Creates the GUI with default settings
-     */
-    public MonsterBattleGUI() {
-        this("Monster Battle Arena");
-    }
-    
-    /**
-     * Constructor with custom title
-     * @param title The window title
+     * Constructor
+     * @param title Window title
      */
     public MonsterBattleGUI(String title) {
         super(title);
         initializeComponents();
         layoutComponents();
-        finalizeWindow();
+        
+        setSize(1000, 750);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setResizable(false);
+        setVisible(true);
     }
     
     /**
-     * Initialize all GUI components
+     * Initialize components
      */
     private void initializeComponents() {
         monsterPanel = new MonsterDisplayPanel();
-        buttonPanel = new ActionButtonPanel(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                handleButtonClick(e);
-            }
-        });
+        buttonPanel = new ActionButtonPanel(e -> handleButtonClick(e));
         inventoryPanel = new InventoryPanel();
         messagePanel = new MessagePanel();
+        playerStatusPanel = new PlayerStatusPanel(100);
     }
     
     /**
-     * Layout all components in the window
+     * Layout components
      */
     private void layoutComponents() {
         setLayout(new BorderLayout(10, 10));
         
-        // Top: Monster Display (largest area)
+        // Center: Monsters
         add(monsterPanel, BorderLayout.CENTER);
         
-        // Bottom: Buttons and Messages
+        // Bottom: Player status, buttons, messages
         JPanel bottomPanel = new JPanel(new BorderLayout(10, 10));
-        bottomPanel.add(buttonPanel, BorderLayout.CENTER);
+        JPanel controlPanel = new JPanel(new BorderLayout(10, 10));
+        controlPanel.add(playerStatusPanel, BorderLayout.NORTH);
+        controlPanel.add(buttonPanel, BorderLayout.CENTER);
+        bottomPanel.add(controlPanel, BorderLayout.CENTER);
         bottomPanel.add(messagePanel, BorderLayout.SOUTH);
         add(bottomPanel, BorderLayout.SOUTH);
         
         // Right: Inventory
         add(inventoryPanel, BorderLayout.EAST);
         
-        // Add padding around everything
         ((JPanel)getContentPane()).setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-    }
-    
-    /**
-     * Finalize window settings
-     */
-    private void finalizeWindow() {
-        setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Center on screen
-        setResizable(false);
     }
     
     // ==================== STUDENT API METHODS ====================
     
     /**
      * Update the monster display
-     * @param monsters ArrayList of monsters to display
+     * @param monsters Your list of monsters
      */
     public void updateMonsters(ArrayList<Monster> monsters) {
-        SwingUtilities.invokeLater(() -> {
-            monsterPanel.setMonsters(monsters);
-        });
+        SwingUtilities.invokeLater(() -> monsterPanel.setMonsters(monsters));
     }
     
     /**
-     * Set custom labels for the action buttons
+     * Update player's current health
+     * @param health Current health value
+     */
+    public void updatePlayerHealth(int health) {
+        SwingUtilities.invokeLater(() -> playerStatusPanel.setHealth(health));
+    }
+    
+    /**
+     * Set player's maximum health (call once at start)
+     * @param maxHealth Maximum health value
+     */
+    public void setPlayerMaxHealth(int maxHealth) {
+        SwingUtilities.invokeLater(() -> playerStatusPanel.setMaxHealth(maxHealth));
+    }
+    
+    /**
+     * Update the inventory display
+     * @param items Your list of items
+     */
+    public void updateInventory(ArrayList<Item> items) {
+        SwingUtilities.invokeLater(() -> inventoryPanel.setItems(items));
+    }
+    
+    /**
+     * Display a message to the player
+     * @param message The message text
+     */
+    public void displayMessage(String message) {
+        SwingUtilities.invokeLater(() -> messagePanel.setMessage(message));
+    }
+    
+    /**
+     * Set button labels (4 buttons: indices 0-3)
      * @param labels Array of 4 button labels
      */
     public void setActionButtons(String[] labels) {
         if (labels.length != 4) {
             throw new IllegalArgumentException("Must provide exactly 4 button labels");
         }
-        SwingUtilities.invokeLater(() -> {
-            buttonPanel.setButtonLabels(labels);
-        });
+        SwingUtilities.invokeLater(() -> buttonPanel.setButtonLabels(labels));
     }
     
     /**
-     * Wait for the player to click an action button
-     * This method blocks until a button is clicked
-     * @return The button index (0-3) that was clicked
+     * Wait for player to click a button
+     * BLOCKS until a button is clicked!
+     * @return Button index that was clicked (0-3)
      */
     public int waitForAction() {
         selectedAction = -1;
         waitingForInput = true;
-        buttonPanel.setEnabled(true);
         
-        // Block until a button is clicked
+        SwingUtilities.invokeLater(() -> buttonPanel.setEnabled(true));
+        
         synchronized(actionLock) {
             while (selectedAction == -1) {
                 try {
@@ -151,67 +163,47 @@ public class MonsterBattleGUI extends JFrame {
     }
     
     /**
-     * Update the inventory display
-     * @param items ArrayList of item names to display
-     */
-    public void updateInventory(ArrayList<Item> items) {
-        SwingUtilities.invokeLater(() -> {
-            inventoryPanel.setItems(items);
-        });
-    }
-    
-    /**
-     * Display a message to the player
-     * @param message The message to display
-     */
-    public void displayMessage(String message) {
-        SwingUtilities.invokeLater(() -> {
-            messagePanel.setMessage(message);
-        });
-    }
-    
-    /**
-     * Highlight a specific monster (for targeting)
-     * @param index The index of the monster to highlight (-1 for none)
+     * Highlight a monster (useful for showing targets)
+     * @param index Monster index to highlight, -1 to clear
      */
     public void highlightMonster(int index) {
-        SwingUtilities.invokeLater(() -> {
-            monsterPanel.highlightMonster(index);
-        });
+        SwingUtilities.invokeLater(() -> monsterPanel.highlightMonster(index));
     }
     
     /**
-     * Enable or disable the action buttons
+     * Enable/disable buttons
      * @param enabled true to enable, false to disable
      */
     public void setButtonsEnabled(boolean enabled) {
-        SwingUtilities.invokeLater(() -> {
-            buttonPanel.setEnabled(enabled);
-        });
+        SwingUtilities.invokeLater(() -> buttonPanel.setEnabled(enabled));
+    }
+    
+    /**
+     * Pause execution (useful for showing effects)
+     * @param milliseconds Time to pause
+     */
+    public void pause(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
     
     // ==================== INTERNAL METHODS ====================
     
     /**
-     * Handle button click events
+     * Handle button clicks
      */
     private void handleButtonClick(ActionEvent e) {
         if (!waitingForInput) return;
         
-        String command = e.getActionCommand();
-        selectedAction = Integer.parseInt(command);
+        selectedAction = Integer.parseInt(e.getActionCommand());
+        
+        SwingUtilities.invokeLater(() -> buttonPanel.setEnabled(false));
         
         synchronized(actionLock) {
             actionLock.notifyAll();
         }
-        
-        buttonPanel.setEnabled(false);
-    }
-    
-    /**
-     * Display the GUI (make it visible)
-     */
-    public void display() {
-        setVisible(true);
     }
 }
