@@ -154,7 +154,7 @@ public class MonsterBattleGUI extends JFrame {
      * Update the inventory display
      * @param items ArrayList of item names to display
      */
-    public void updateInventory(ArrayList<String> items) {
+    public void updateInventory(ArrayList<Item> items) {
         SwingUtilities.invokeLater(() -> {
             inventoryPanel.setItems(items);
         });
