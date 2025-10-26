@@ -13,6 +13,8 @@ import gui.MonsterBattleGUI;
  * 1. Create GUI
  * 2. Setup game (monsters, items, health)
  * 3. Game loop: get action → do action → check win/loss
+ * 
+ * NEW: Shows how to use the 4 buttons for character selection before game starts!
  */
 public class GameDemo {
     
@@ -24,6 +26,12 @@ public class GameDemo {
     private ArrayList<Item> inventory;
     private int playerHealth;
     private int maxHealth;
+    
+    // Player stats (customized by character choice)
+    private int playerDamage;
+    private int playerShield;
+    private int playerHeal;
+    private int playerSpeed;
     
     /**
      * Main method - start the game!
@@ -48,9 +56,12 @@ public class GameDemo {
         // Create the GUI
         gui = new MonsterBattleGUI("Monster Battle - DEMO");
         
-        // Setup player health
+        // PICK YOUR CHARACTER BUILD (using the 4 action buttons!)
+        pickCharacterBuild();
+        
+        // Setup player health (based on character choice)
         maxHealth = 100;
-        playerHealth = 100;
+        playerHealth = maxHealth;
         gui.setPlayerMaxHealth(maxHealth);
         gui.updatePlayerHealth(playerHealth);
         
@@ -68,12 +79,70 @@ public class GameDemo {
         addBomb(20);
         gui.updateInventory(inventory);
         
-        // Setup buttons
+        // Setup buttons for gameplay (now that character is chosen)
         String[] buttons = {"Attack", "Defend", "Heal", "Use Item"};
         gui.setActionButtons(buttons);
         
         // Welcome message
-        gui.displayMessage("Battle Start! Choose your action.");
+        gui.displayMessage("Battle Start! You are a " + getCharacterName() + "!");
+    }
+    
+    /**
+     * Let player pick their character build using the 4 buttons
+     * This demonstrates using the GUI for menu choices!
+     */
+    private void pickCharacterBuild() {
+        // Set button labels to character classes
+        String[] characterClasses = {"Fighter", "Tank", "Healer", "Ninja"};
+        gui.setActionButtons(characterClasses);
+        
+        // Display choice prompt
+        gui.displayMessage("---- PICK YOUR BUILD ----");
+        
+        // Wait for player to click a button (0-3)
+        int choice = gui.waitForAction();
+        
+        // Initialize default stats
+        playerDamage = 200;
+        playerShield = 50;
+        playerHeal = 50;
+        playerSpeed = 10;
+        
+        // Customize stats based on character choice
+        if (choice == 0) {
+            // Fighter: high damage, low healing and shield
+            gui.displayMessage("You chose Fighter! High damage, but weak defense.");
+            playerShield -= (int)(Math.random() * 45 + 1) + 5;  // Reduce shield by 6-50
+            playerHeal -= (int)(Math.random() * 46) + 5;        // Reduce heal by 5-50
+        } else if (choice == 1) {
+            // Tank: high shield, low damage and speed
+            gui.displayMessage("You chose Tank! Tough defense, but slow attacks.");
+            playerSpeed -= (int)(Math.random() * 9) + 1;        // Reduce speed by 1-9
+            playerDamage -= (int)(Math.random() * 100) + 100;   // Reduce damage by 100-199
+        } else if (choice == 2) {
+            // Healer: high healing, low damage and shield
+            gui.displayMessage("You chose Healer! Great recovery, but fragile.");
+            playerDamage -= (int)(Math.random() * 26) + 5;      // Reduce damage by 5-30
+            playerShield -= (int)(Math.random() * 46) + 5;      // Reduce shield by 5-50
+        } else {
+            // Ninja: high speed, low healing and health
+            gui.displayMessage("You chose Ninja! Fast and deadly, but risky.");
+            playerHeal -= (int)(Math.random() * 46) + 5;        // Reduce heal by 5-50
+            maxHealth -= (int)(Math.random() * 21) + 5;         // Reduce max health by 5-25
+        }
+        
+        // Pause to let player see their choice
+        gui.pause(1500);
+    }
+    
+    /**
+     * Get the character name based on stats (for messages)
+     */
+    private String getCharacterName() {
+        if (playerDamage > 150 && playerShield < 30) return "Fighter";
+        if (playerShield > 40 && playerDamage < 150) return "Tank";
+        if (playerHeal > 40 && playerDamage < 180) return "Healer";
+        return "Ninja";
     }
     
     /**
@@ -84,7 +153,7 @@ public class GameDemo {
         while (countLivingMonsters() > 0 && playerHealth > 0) {
             
             // PLAYER'S TURN
-            gui.displayMessage("Your turn! HP: " + playerHealth);
+            gui.displayMessage("Your turn! HP: " + playerHealth + " | DMG: " + playerDamage);
             int action = gui.waitForAction();  // Wait for button click
             handlePlayerAction(action);
             gui.updateMonsters(monsters);
@@ -119,12 +188,14 @@ public class GameDemo {
     }
     
     /**
-     * Attack a random monster
+     * Attack a random monster (uses playerDamage stat)
      */
     private void attackMonster() {
         Monster target = getRandomLivingMonster();
         if (target != null) {
-            int damage = (int)(Math.random() * 30) + 10;
+            // Calculate damage based on player's damage stat
+            int baseDamage = (int)(playerDamage * 0.15);  // 15% of damage stat
+            int damage = baseDamage + (int)(Math.random() * baseDamage);  // ±50% variance
             target.takeDamage(damage);
             gui.displayMessage("💥 You hit for " + damage + " damage!");
             
@@ -137,17 +208,19 @@ public class GameDemo {
     }
     
     /**
-     * Defend (reduce next attack)
+     * Defend (uses playerShield stat to reduce damage)
      */
     private void defend() {
-        gui.displayMessage("🛡️ You brace for impact! Defense up!");
+        gui.displayMessage("🛡️ You brace for impact! (Shield: " + playerShield + ")");
+        // Note: In a real game, you'd track this state and reduce incoming damage
+        // This is just demonstrating the character stats
     }
     
     /**
-     * Heal yourself
+     * Heal yourself (uses playerHeal stat)
      */
     private void heal() {
-        int healAmount = (int)(Math.random() * 20) + 10;
+        int healAmount = (int)(playerHeal * 0.5) + (int)(Math.random() * playerHeal * 0.5);
         playerHealth = Math.min(maxHealth, playerHealth + healAmount);
         gui.updatePlayerHealth(playerHealth);
         gui.displayMessage("💚 You healed for " + healAmount + " HP!");

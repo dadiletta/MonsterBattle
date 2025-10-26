@@ -14,14 +14,14 @@ import gui.MonsterBattleGUI;
  * 3. Customize the game loop if you want
  * 4. Add your own helper methods
  * 
- * Run this file to play YOUR game!
+ * Run this file to play YOUR game
  */
 public class Game {
     
-    // The GUI (use this to display everything)
+    // The GUI (I had AI build most of this)
     private MonsterBattleGUI gui;
     
-    // Game state - YOU manage these!
+    // Game state - YOU manage these
     private ArrayList<Monster> monsters;
     private ArrayList<Item> inventory;
     private int playerHealth;
@@ -31,8 +31,8 @@ public class Game {
      * Main method - start YOUR game!
      */
     public static void main(String[] args) {
-        Game game = new Game();
-        game.play();
+        Game game = new Game(); // it instantiates a copy of this file. We're not running static
+        game.play(); // this extra step is unnecessary AI stuff
     }
     
     /**
