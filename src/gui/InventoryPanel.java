@@ -1,4 +1,8 @@
+package gui;
 import javax.swing.*;
+
+import Item;
+
 import java.awt.*;
 import java.util.ArrayList;
 

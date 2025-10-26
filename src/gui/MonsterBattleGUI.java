@@ -1,4 +1,9 @@
+package gui;
 import javax.swing.*;
+
+import Item;
+import Monster;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;

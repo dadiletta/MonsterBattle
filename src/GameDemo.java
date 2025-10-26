@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 
+import gui.MonsterBattleGUI;
+
 /**
  * GameDemo - Complete working example of a monster battle game
  * 
