@@ -14,7 +14,7 @@ import gui.MonsterBattleGUI;
  * 2. Setup game (monsters, items, health)
  * 3. Game loop: get action → do action → check win/loss
  * 
- * NEW: Shows how to use the 4 buttons for character selection before game starts!
+ * NEW: Shows how to use the 4 buttons for difficulty selection AND character selection before game starts!
  */
 public class GameDemo {
     
@@ -56,6 +56,9 @@ public class GameDemo {
         // Create the GUI
         gui = new MonsterBattleGUI("Monster Battle - DEMO");
         
+        // CHOOSE DIFFICULTY (number of monsters to face)
+        int numMonsters = chooseDifficulty();
+        
         // PICK YOUR CHARACTER BUILD (using the 4 action buttons!)
         pickCharacterBuild();
         
@@ -65,11 +68,11 @@ public class GameDemo {
         gui.setPlayerMaxHealth(maxHealth);
         gui.updatePlayerHealth(playerHealth);
         
-        // Create monsters
+        // Create monsters based on chosen difficulty
         monsters = new ArrayList<>();
-        monsters.add(new Monster());
-        monsters.add(new Monster());
-        monsters.add(new Monster());
+        for (int i = 0; i < numMonsters; i++) {
+            monsters.add(new Monster());
+        }
         gui.updateMonsters(monsters);
         
         // Create items
@@ -84,7 +87,31 @@ public class GameDemo {
         gui.setActionButtons(buttons);
         
         // Welcome message
-        gui.displayMessage("Battle Start! You are a " + getCharacterName() + "!");
+        gui.displayMessage("Battle Start! You are a " + getCharacterName() + " facing " + numMonsters + " monsters!");
+    }
+    
+    /**
+     * Let player choose difficulty (number of monsters) using the 4 buttons
+     * This demonstrates using the GUI for menu choices!
+     */
+    private int chooseDifficulty() {
+        // Set button labels to difficulty levels
+        String[] difficulties = {"Easy (2)", "Medium (3)", "Hard (4)", "Extreme (5)"};
+        gui.setActionButtons(difficulties);
+        
+        // Display choice prompt
+        gui.displayMessage("---- CHOOSE DIFFICULTY ----");
+        
+        // Wait for player to click a button (0-3)
+        int choice = gui.waitForAction();
+        
+        // Determine number of monsters based on choice
+        int numMonsters = 2 + choice;  // 2, 3, 4, or 5 monsters
+        
+        gui.displayMessage("Difficulty selected: " + difficulties[choice] + " monsters!");
+        gui.pause(1500);
+        
+        return numMonsters;
     }
     
     /**
