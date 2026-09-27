@@ -52,13 +52,28 @@ gui.setPlayerMaxHealth(100);            // Set max HP (call once)
    - Check win/loss
 3. **Your Code**: Fill in what each action does!
 
-## Creating Monsters & Items
+## Your own Monster
 
-Use the provided `Monster` and `Item` classes:
+Your unit page has you write your own `Monster` class first, from nothing.
+`src/game/Monster.java` is the starter's finished one: **leave it closed until
+yours runs**, then compare the two.
+
+When yours replaces it, keep these four methods, spelled exactly like this.
+The display calls them by name, so they are a promise your class makes to code
+you did not write:
+
 ```java
-monsters.add(new Monster());                    // Random stats
-monsters.add(new Monster("Fire Breath"));       // With special ability
+public int health()       // above 0 means alive
+public double damage()
+public int speed()
+public String special()   // "" for no special move
+```
 
+Any other accessor you add follows the usual `getX()` convention.
+
+## Creating Items
+
+```java
 // Items use lambdas to define what they do
 inventory.add(new Item("Potion", "🧪", () -> {
     playerHealth += 30;

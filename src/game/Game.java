@@ -4,50 +4,32 @@ import java.util.ArrayList;
 import gui.MonsterBattleGUI;
 
 /**
- * Game - YOUR monster battle game!
- * 
- * Build your game here. Look at GameDemo.java for examples.
- * 
- * Steps:
- * 1. Fill in setupGame() - create monsters, items, set health
- * 2. Fill in the action methods - what happens when player acts?
- * 3. Customize the game loop if you want
- * 4. Add your own helper methods
- * 
- * Run this file to play YOUR game
+ * Your game. GameDemo.java is a finished one to copy patterns from.
+ * Fill in each TODO, and run this file after every change.
  */
 public class Game {
     
-    // The GUI (I had AI build most of this)
+    // The window. You call its methods; you never need to open src/gui.
     private MonsterBattleGUI gui;
     
-    // Game state - YOU manage these
+    // Game state: change these, then tell the gui.
     private ArrayList<Monster> monsters;
     private ArrayList<Item> inventory;
     private int playerHealth;
     private int maxHealth;
     
-    /**
-     * Main method - start YOUR game!
-     */
     public static void main(String[] args) {
-        Game game = new Game(); // it instantiates a copy of this file. We're not running static
-        game.play(); // this extra step is unnecessary AI stuff
+        // main is static, so it makes one Game object to play (Unit 3.7).
+        Game game = new Game();
+        game.play();
     }
     
-    /**
-     * Play the game!
-     */
     public void play() {
         setupGame();
         gameLoop();
     }
     
-    /**
-     * Setup - create the GUI and initial game state
-     * 
-     * TODO: Customize this! How many monsters? What items? How much health?
-     */
+    // TODO: How much health, how many monsters, which items? Your choice.
     private void setupGame() {
         // Create the GUI
         gui = new MonsterBattleGUI("Monster Battle - MY GAME");
@@ -64,9 +46,8 @@ public class Game {
         monsters.add(new Monster());
         gui.updateMonsters(monsters);
         
-        // TODO: Create starting items
+        // TODO: Create starting items (GameDemo's addBomb() shows the shape)
         inventory = new ArrayList<>();
-        // Add items here! Look at GameDemo.java for examples
         gui.updateInventory(inventory);
         
         // TODO: Customize button labels
@@ -77,12 +58,7 @@ public class Game {
         gui.displayMessage("Battle Start! Choose your action.");
     }
     
-    /**
-     * Main game loop
-     * 
-     * This controls the flow: player turn → monster turn → check game over
-     * You can modify this if you want!
-     */
+    // Player turn, then monster turn, until one side is gone.
     private void gameLoop() {
         // Keep playing while monsters alive and player alive
         while (countLivingMonsters() > 0 && playerHealth > 0) {
@@ -110,11 +86,7 @@ public class Game {
         }
     }
     
-    /**
-     * Handle player's action choice
-     * 
-     * TODO: What happens for each action?
-     */
+    // The four buttons, left to right, are 0 to 3.
     private void handlePlayerAction(int action) {
         switch (action) {
             case 0: // Attack button
@@ -132,51 +104,22 @@ public class Game {
         }
     }
     
-    /**
-     * Attack a monster
-     * 
-     * TODO: How does attacking work in your game?
-     * - How much damage?
-     * - Which monster gets hit?
-     * - Special effects?
-     */
+    // TODO: How much damage, and to which monster?
     private void attackMonster() {
-        // TODO: Implement your attack!
-        // Hint: Look at GameDemo.java for an example
-        
         gui.displayMessage("TODO: Implement attack!");
     }
     
-    /**
-     * Defend
-     * 
-     * TODO: What does defending do?
-     * - Reduce damage?
-     * - Block next attack?
-     * - Something else?
-     */
+    // TODO: What does defending change? Less damage next turn? A blocked hit?
     private void defend() {
-        // TODO: Implement your defend!
-        
         gui.displayMessage("TODO: Implement defend!");
     }
     
-    /**
-     * Heal yourself
-     * 
-     * TODO: How does healing work?
-     * - How much HP?
-     * - Any limits?
-     */
+    // TODO: How much health back, and can it go past maxHealth?
     private void heal() {
-        // TODO: Implement your heal!
-        
         gui.displayMessage("TODO: Implement heal!");
     }
     
-    /**
-     * Use an item from inventory
-     */
+    // Uses the first item in the inventory.
     private void useItem() {
         if (inventory.isEmpty()) {
             gui.displayMessage("No items in inventory!");
@@ -189,27 +132,12 @@ public class Game {
         item.use();  // The item knows what to do!
     }
     
-    /**
-     * Monster attacks player
-     * 
-     * TODO: Customize how monsters attack!
-     * - How much damage?
-     * - Which monster attacks?
-     * - Special abilities?
-     */
+    // TODO: Which monster attacks, and for how much? A special move goes here.
     private void monsterAttack() {
-        // TODO: Implement monster attacks!
-        // Hint: Look at GameDemo.java for an example
-        
         gui.displayMessage("TODO: Implement monster attack!");
     }
     
-    // ==================== HELPER METHODS ====================
-    // Add your own helper methods here!
-    
-    /**
-     * Count how many monsters are still alive
-     */
+    // Helpers. Add your own below these two.
     private int countLivingMonsters() {
         int count = 0;
         for (Monster m : monsters) {
@@ -218,9 +146,6 @@ public class Game {
         return count;
     }
     
-    /**
-     * Get a random living monster
-     */
     private Monster getRandomLivingMonster() {
         ArrayList<Monster> alive = new ArrayList<>();
         for (Monster m : monsters) {
@@ -229,11 +154,4 @@ public class Game {
         if (alive.isEmpty()) return null;
         return alive.get((int)(Math.random() * alive.size()));
     }
-    
-    // TODO: Add more helper methods as you need them!
-    // Examples:
-    // - Method to find the strongest monster
-    // - Method to check if player has a specific item
-    // - Method to add special effects
-    // - etc.
 }
