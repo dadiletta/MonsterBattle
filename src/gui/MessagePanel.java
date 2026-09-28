@@ -73,7 +73,7 @@ public class MessagePanel extends JPanel {
         previousMessageLabel.setForeground(PREVIOUS_TEXT_COLOR);
         
         // Set new current message
-        currentMessageLabel.setText(message);
+        currentMessageLabel.setText(Emoji.fit(message, MESSAGE_FONT));
         currentMessageLabel.setForeground(TEXT_COLOR);
     }
     
@@ -91,7 +91,7 @@ public class MessagePanel extends JPanel {
         previousMessageLabel.setForeground(PREVIOUS_TEXT_COLOR);
         
         // Set new current message with color
-        currentMessageLabel.setText(message);
+        currentMessageLabel.setText(Emoji.fit(message, MESSAGE_FONT));
         currentMessageLabel.setForeground(color);
     }
     

@@ -57,7 +57,7 @@ public class ActionButtonPanel extends JPanel {
      * @return The styled button
      */
     private JButton createStyledButton(String label, int index) {
-        JButton button = new JButton(label);
+        JButton button = new JButton(Emoji.fit(label, BUTTON_FONT));
         button.setFont(BUTTON_FONT);
         button.setBackground(BUTTON_BG);
         button.setForeground(Color.WHITE);
@@ -116,7 +116,7 @@ public class ActionButtonPanel extends JPanel {
         }
         
         for (int i = 0; i < 4; i++) {
-            buttons[i].setText(labels[i]);
+            buttons[i].setText(Emoji.fit(labels[i], BUTTON_FONT));
         }
     }
     

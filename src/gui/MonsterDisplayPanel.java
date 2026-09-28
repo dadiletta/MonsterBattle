@@ -148,11 +148,14 @@ public class MonsterDisplayPanel extends JPanel {
             speedLabel.setForeground(Color.CYAN);
             speedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             
-            // Special ability if exists
-            if (!monster.special().isEmpty()) {
-                JLabel specialLabel = new JLabel("★ " + monster.special());
+            // Special ability if exists. A Monster that never sets special
+            // returns null, and one exception here blanks every tile.
+            String special = monster.special();
+            if (special != null && !special.isEmpty()) {
+                Font specialFont = new Font("Arial", Font.ITALIC, 11);
+                JLabel specialLabel = new JLabel(Emoji.fit("★ " + special, specialFont));
                 specialLabel.setForeground(new Color(255, 215, 0));
-                specialLabel.setFont(new Font("Arial", Font.ITALIC, 11));
+                specialLabel.setFont(specialFont);
                 specialLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
                 infoPanel.add(specialLabel);
             }
